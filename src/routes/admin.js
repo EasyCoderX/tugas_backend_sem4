@@ -557,6 +557,18 @@ router.delete('/admin/games/:id/items/:itemName', async (req, res) => {
 // CATEGORIES CRUD (admin)
 // ==============================
 
+/**
+ * @openapi
+ * /api/admin/categories:
+ *   get:
+ *     summary: List all game categories (admin)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Array of categories
+ */
 router.get('/admin/categories', async (req, res) => {
   try {
     const categories = await req.prisma.categories.findMany({
@@ -568,6 +580,30 @@ router.get('/admin/categories', async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ * /api/admin/categories:
+ *   post:
+ *     summary: Create a new category (admin)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name, slug]
+ *             properties:
+ *               name: { type: string }
+ *               slug: { type: string }
+ *     responses:
+ *       201:
+ *         description: Category created
+ *       400:
+ *         description: Validation error
+ */
 router.post('/admin/categories', async (req, res) => {
   try {
     const { name, slug } = req.body;
@@ -581,6 +617,34 @@ router.post('/admin/categories', async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ * /api/admin/categories/{id}:
+ *   put:
+ *     summary: Update a category (admin)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name: { type: string }
+ *               slug: { type: string }
+ *     responses:
+ *       200:
+ *         description: Category updated
+ *       404:
+ *         description: Category not found
+ */
 router.put('/admin/categories/:id', async (req, res) => {
   try {
     const { name, slug } = req.body;
@@ -594,6 +658,25 @@ router.put('/admin/categories/:id', async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ * /api/admin/categories/{id}:
+ *   delete:
+ *     summary: Delete a category (admin)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Category deleted
+ *       404:
+ *         description: Category not found
+ */
 router.delete('/admin/categories/:id', async (req, res) => {
   try {
     await req.prisma.categories.delete({ where: { id: req.params.id } });
@@ -607,6 +690,18 @@ router.delete('/admin/categories/:id', async (req, res) => {
 // CAROUSEL SLIDES CRUD (admin)
 // ==============================
 
+/**
+ * @openapi
+ * /api/admin/carousel-slides:
+ *   get:
+ *     summary: List all carousel slides (admin)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Array of carousel slides
+ */
 router.get('/admin/carousel-slides', async (req, res) => {
   try {
     const slides = await req.prisma.carousel_slides.findMany({
@@ -630,6 +725,35 @@ router.get('/admin/carousel-slides', async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ * /api/admin/carousel-slides:
+ *   post:
+ *     summary: Create a carousel slide with image (admin)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required: [title, cta, link]
+ *             properties:
+ *               title: { type: string }
+ *               subtitle: { type: string }
+ *               cta: { type: string }
+ *               link: { type: string }
+ *               sortOrder: { type: integer }
+ *               isActive: { type: string }
+ *               image: { type: string, format: binary }
+ *     responses:
+ *       201:
+ *         description: Slide created
+ *       400:
+ *         description: Validation error
+ */
 router.post('/admin/carousel-slides', imageUpload.fields([
   { name: 'image', maxCount: 1 }
 ]), async (req, res) => {
@@ -655,6 +779,39 @@ router.post('/admin/carousel-slides', imageUpload.fields([
   }
 });
 
+/**
+ * @openapi
+ * /api/admin/carousel-slides/{id}:
+ *   put:
+ *     summary: Update a carousel slide and its image (admin)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title: { type: string }
+ *               subtitle: { type: string }
+ *               cta: { type: string }
+ *               link: { type: string }
+ *               sortOrder: { type: integer }
+ *               isActive: { type: string }
+ *               removeImage: { type: string }
+ *               image: { type: string, format: binary }
+ *     responses:
+ *       200:
+ *         description: Slide updated
+ *       404:
+ *         description: Slide not found
+ */
 router.put('/admin/carousel-slides/:id', imageUpload.fields([
   { name: 'image', maxCount: 1 }
 ]), async (req, res) => {
@@ -683,6 +840,25 @@ router.put('/admin/carousel-slides/:id', imageUpload.fields([
   }
 });
 
+/**
+ * @openapi
+ * /api/admin/carousel-slides/{id}:
+ *   delete:
+ *     summary: Delete a carousel slide (admin)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Slide deleted
+ *       404:
+ *         description: Slide not found
+ */
 router.delete('/admin/carousel-slides/:id', async (req, res) => {
   try {
     await req.prisma.carousel_slides.delete({ where: { id: req.params.id } });
@@ -696,6 +872,18 @@ router.delete('/admin/carousel-slides/:id', async (req, res) => {
 // PROMOS CRUD (admin)
 // ==============================
 
+/**
+ * @openapi
+ * /api/admin/promos:
+ *   get:
+ *     summary: List all promotions (admin)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Array of promotions
+ */
 router.get('/admin/promos', async (req, res) => {
   try {
     const promos = await req.prisma.promos.findMany({
@@ -718,6 +906,35 @@ router.get('/admin/promos', async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ * /api/admin/promos:
+ *   post:
+ *     summary: Create a new promotion (admin)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [category, gameName, periodText, cashbackText]
+ *             properties:
+ *               category: { type: string }
+ *               gameName: { type: string }
+ *               periodText: { type: string }
+ *               timeText: { type: string }
+ *               cashbackText: { type: string }
+ *               notes: { type: string }
+ *               isActive: { type: string }
+ *     responses:
+ *       201:
+ *         description: Promotion created
+ *       400:
+ *         description: Validation error
+ */
 router.post('/admin/promos', async (req, res) => {
   try {
     const { category, gameName, periodText, timeText, cashbackText, notes, isActive } = req.body;
@@ -741,6 +958,39 @@ router.post('/admin/promos', async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ * /api/admin/promos/{id}:
+ *   put:
+ *     summary: Update a promotion (admin)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               category: { type: string }
+ *               gameName: { type: string }
+ *               periodText: { type: string }
+ *               timeText: { type: string }
+ *               cashbackText: { type: string }
+ *               notes: { type: string }
+ *               isActive: { type: string }
+ *     responses:
+ *       200:
+ *         description: Promotion updated
+ *       404:
+ *         description: Promotion not found
+ */
 router.put('/admin/promos/:id', async (req, res) => {
   try {
     const promo = await req.prisma.promos.findUnique({ where: { id: req.params.id } });
@@ -766,6 +1016,25 @@ router.put('/admin/promos/:id', async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ * /api/admin/promos/{id}:
+ *   delete:
+ *     summary: Delete a promotion (admin)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Promotion deleted
+ *       404:
+ *         description: Promotion not found
+ */
 router.delete('/admin/promos/:id', async (req, res) => {
   try {
     await req.prisma.promos.delete({ where: { id: req.params.id } });
@@ -779,6 +1048,18 @@ router.delete('/admin/promos/:id', async (req, res) => {
 // PROMO BANNERS CRUD (admin)
 // ==============================
 
+/**
+ * @openapi
+ * /api/admin/promo-banners:
+ *   get:
+ *     summary: List all promo page banners (admin)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Array of promo banners
+ */
 router.get('/admin/promo-banners', async (req, res) => {
   try {
     const banners = await req.prisma.promo_banners.findMany({
@@ -802,6 +1083,35 @@ router.get('/admin/promo-banners', async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ * /api/admin/promo-banners:
+ *   post:
+ *     summary: Create a promo page banner with image (admin)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required: [title, periodText, subheading]
+ *             properties:
+ *               title: { type: string }
+ *               periodText: { type: string }
+ *               regionText: { type: string }
+ *               categoryText: { type: string }
+ *               subheading: { type: string }
+ *               isActive: { type: string }
+ *               image: { type: string, format: binary }
+ *     responses:
+ *       201:
+ *         description: Banner created
+ *       400:
+ *         description: Validation error
+ */
 router.post('/admin/promo-banners', imageUpload.fields([
   { name: 'image', maxCount: 1 }
 ]), async (req, res) => {
